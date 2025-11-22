@@ -82,8 +82,24 @@ fi
 
 $BASE_PATH/update.sh "$REPO_URL" "$REPO_BRANCH" "$BASE_PATH/$BUILD_DIR" "$COMMIT_HASH"
 
+append_self_depends() {
+    local mk_path="$BASE_PATH/$BUILD_DIR/package/kernel/linux/modules/202511201112.mk"
+    local self_depends="kmod-nft-socket kmod-nf-socket"
+    local depends_string=""
+    for depend in $self_depends; do
+        if grep -q "CONFIG_PACKAGE_$depend=y" "$CONFIG_FILE"; then
+            depends_string="$depends_string +$depend"
+        fi
+    done
+    if [[ -n "$depends_string" ]]; then
+        echo "DEPENDS+=$depends_string" >> $mk_path
+        echo "add depends$depends_string"
+    fi
+}
+
 apply_config
 remove_uhttpd_dependency
+append_self_depends
 
 cd "$BASE_PATH/$BUILD_DIR"
 make defconfig
