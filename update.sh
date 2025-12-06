@@ -38,7 +38,8 @@ FEEDS_CONF="feeds.conf.default"
 GOLANG_REPO="https://github.com/sbwml/packages_lang_golang"
 GOLANG_BRANCH="25.x"
 THEME_SET="argon"
-LAN_ADDR="192.168.1.1"
+LAN_ADDR="192.168.31.1"
+CONFIG_HOSTNAME="redmi-ax6.local"
 
 clone_repo() {
     if [[ ! -d $BUILD_DIR ]]; then
@@ -284,6 +285,13 @@ fix_mk_def_depends() {
 }
 
 update_default_lan_addr() {
+    local CFG_PATH="$BUILD_DIR/package/base-files/files/bin/config_generate"
+    if [ -f $CFG_PATH ]; then
+        sed -i "s/hostname='ImmortalWrt'/hostname='$CONFIG_HOSTNAME'/g" $CFG_PATH
+    fi
+}
+
+update_default_hostname() {
     local CFG_PATH="$BUILD_DIR/package/base-files/files/bin/config_generate"
     if [ -f $CFG_PATH ]; then
         sed -i 's/192\.168\.[0-9]*\.[0-9]*/'$LAN_ADDR'/g' $CFG_PATH
@@ -1063,6 +1071,7 @@ main() {
     change_dnsmasq2full
     fix_mk_def_depends
     update_default_lan_addr
+    update_default_hostname
     remove_something_nss_kmod
     update_affinity_script
     update_ath11k_fw
