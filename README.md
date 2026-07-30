@@ -59,7 +59,7 @@ REMOVE_CONFIG_FRAGMENTS=proxy ./build.sh x64_immwrt config_preview
 
 GitHub Actions 的手动构建也提供 `add_fragments` 与 `remove_fragments` 输入项，语义与上述环境变量一致。
 
-编译完成后，脚本会从 `<BUILD_DIR>/bin/targets/` 收集固件文件到仓库根目录的 `firmware/`。每次完整构建前会清理旧的目标固件文件，`firmware/Packages.manifest` 会被移除。
+编译完成后，脚本会从 `<BUILD_DIR>/bin/targets/` 收集固件文件到仓库根目录的 `firmware/`。除了原始 `*.manifest` 外，还会额外生成 `*.size.manifest`，在每一行追加对应包文件（`bin/targets/<target>/<subtarget>/packages` 下 `*.ipk`/`*.opkg`）的大小（KiB，向上取整）。每次完整构建前会清理旧的目标固件文件，`firmware/Packages.manifest` 会被移除。
 
 ## 5. 支持设备
 

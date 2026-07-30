@@ -461,6 +461,15 @@ make -j$(($(nproc) + 1)) || make -j1 V=s
 FIRMWARE_DIR="$BASE_PATH/../firmware"
 \rm -rf "$FIRMWARE_DIR"
 mkdir -p "$FIRMWARE_DIR"
+
+# 生成 packages.size 文件，记录每个 ipk 包的文件名和大小。
+packages_size="$FIRMWARE_DIR/packages.size"
+: > "$packages_size"
+while IFS= read -r -d '' ipk_file; do
+    printf "%s\t%s\n" "$(basename "$ipk_file")" "$(stat -c%s "$ipk_file" 2>/dev/null || wc -c < "$ipk_file")" >> "$packages_size"
+done < <(find "$TARGET_DIR" -type f -name "*.ipk" -print0)
+sort -t $'\t' -k2,2nr -o "$packages_size" "$packages_size"
+
 find "$TARGET_DIR" -type f \( -name "*.bin" -o -name "*.manifest" -o -name "*efi.img.gz" -o -name "*.itb" -o -name "*.fip" -o -name "*.ubi" -o -name "*rootfs.tar.gz" \) -exec cp -f {} "$FIRMWARE_DIR/" \;
 \rm -f "$BASE_PATH/../firmware/Packages.manifest" 2>/dev/null
 
